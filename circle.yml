@@ -1,0 +1,7 @@
+machine:
+  node:
+    version: 0.10.40
+test:
+  override:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit
+    - mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/junit/test-results.xml
