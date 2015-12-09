@@ -1,5 +1,5 @@
 {
-  "name": "rabbit-worker",
+  "name": "rabbit-task",
   "version": "0.0.1",
   "description": "opinionated RabbitMQ worker",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bookmd/rabbit-worker.git"
+    "url": "git+https://github.com/bookmd/rabbit-task.git"
   },
   "keywords": [
     "rabbit",
@@ -18,9 +18,9 @@
   "author": "Asaf David",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bookmd/rabbit-worker/issues"
+    "url": "https://github.com/bookmd/rabbit-task/issues"
   },
-  "homepage": "https://github.com/bookmd/rabbit-worker#readme",
+  "homepage": "https://github.com/bookmd/rabbit-task#readme",
   "dependencies": {
     "amqplib": "^0.4.0",
     "core-js": "^1.2.6",
