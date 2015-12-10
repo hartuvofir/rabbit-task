@@ -23,6 +23,7 @@
   "homepage": "https://github.com/bookmd/rabbit-task#readme",
   "dependencies": {
     "amqplib": "^0.4.0",
+    "core-js": "^1.2.6",
     "lodash": "^3.10.1",
     "minimist": "^1.2.0"
   },
