@@ -1,6 +1,6 @@
 {
   "name": "rabbit-task",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "opinionated RabbitMQ worker",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,6 @@
   "homepage": "https://github.com/bookmd/rabbit-task#readme",
   "dependencies": {
     "amqplib": "^0.4.0",
-    "core-js": "^1.2.6",
     "lodash": "^3.10.1",
     "minimist": "^1.2.0"
   },
