@@ -1,6 +1,6 @@
 {
   "name": "rabbit-task",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "opinionated RabbitMQ worker",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,9 @@
   },
   "devDependencies": {
     "chai": "^3.4.1",
+    "chai-as-promised": "^5.2.0",
     "mocha": "^2.3.4",
-    "mocha-junit-reporter": "^1.9.1"
+    "mocha-junit-reporter": "^1.9.1",
+    "joi": "^7.0.1"
   }
 }
