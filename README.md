@@ -27,7 +27,7 @@ worker.start();
 ```
 
 ## Docs
-coming soon
+coming soon (defaultHandler docs too)
 
 ## Requirements 
 - Node version > 4.0.0
