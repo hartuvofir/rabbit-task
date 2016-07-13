@@ -1,6 +1,6 @@
 {
   "name": "rabbit-task",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "opinionated RabbitMQ worker",
   "main": "index.js",
   "scripts": {
