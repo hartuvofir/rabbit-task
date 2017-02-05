@@ -9,8 +9,8 @@ The worker receives messages containing a string representing a mathematical exp
 4. Run the client using `gulp start-client`. Once the client is up, you can type in expressions, like "2 + 2".
 
 ## The Client
-The client is implemented in client/client.js. It defined a class named Client, which has a single method, evaluate, which sends the expression string to the worker and receives the result.
-the rabbit-task connection object to send the request to the worker.
+The client is implemented in client/client.js. It defines a class named Client, which has a single method called evaluate, which sends the expression string to the worker and receives the result of the evaluation.
+It uses a rabbit-task connection object to send the request to the worker.
 
 ```javascript
 function Client(client) { // Constructor
@@ -33,7 +33,7 @@ Client.prototype.evaluate = function(expr) {
 The worker has 5 short .js files: `worker.js`, `schema.js`, `router.js`, `configuration.js` and `calculatorHandler.js`.
 
 ### calculatorHandler.js
-This file defines what happens when a calculation request is received in the worker.
+This file defines what happens when a calculation request is received by the worker.
 It uses the following properties:
 * `pattern` - a pattern that defines which messages are processed as calculation requests, also called "topic".
 * `name` - the name of the hadler.
@@ -88,7 +88,7 @@ var router = new HandlerRouter([
 module.exports = router;
 ```
 ### configuration.js
-This class is responsible for setting up Rabbit for this example, which includes creating a dedicated exchange, a queue and binding them together (fanout).
+This class is responsible for setting up Rabbit for this example, which includes creating a dedicated exchange, a queue and binding them together (using 'fanout').
 ```javascript
 function Configuration(conn) {
   this.conn = conn;
