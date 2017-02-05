@@ -5,7 +5,7 @@ The worker receives messages containing a string representing a mathematical exp
 ## How to run
 1. `cd examples/calculator`
 2. `npm install`
-3. Run the server using `gulp start-server`.
+3. Run the worker using `gulp start-worker`.
 4. Run the client using `gulp start-client`. Once the client is up, you can type in expressions, like "2 + 2".
 
 ## The Client
