@@ -58,10 +58,8 @@ calculatorHandler =  {
 
 function evaluate(msg) {
   var expression = msg.content.expression;
-  console.log('received expression: ' + expression);
 
-  var result = math.eval(expression);
-  console.log('result: ' + result);
+  var result = math.eval(expression); // mathjs is used to evaluate the expression
   return { result: result };
 }
 
