@@ -26,7 +26,7 @@ Client.prototype.evaluate = function(expr) {
 
 var rabbitClient = new RabbitClient(constants.queueName, process.env.RABBIT_CONSUMER_TAG); // Setup a new rabbit-task client.
 
-rabbitClient.connect().then(function () { // Connect to rabbit and start listening for user input when the connected.
+rabbitClient.connect().then(function () { // Connect to rabbit and start listening for user input when connected.
   var client = new Client(rabbitClient);
 
   console.log('Enter expression to evaluate');
