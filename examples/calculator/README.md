@@ -10,7 +10,10 @@ The worker receives messages containing a string representing a mathematical exp
 
 ## The Client
 The client is implemented in client/client.js. It defines a class named Client, which has a single method called evaluate, which sends the expression string to the worker and receives the result of the evaluation.
-It uses a rabbit-task connection object to send the request to the worker.
+
+It uses a rabbit-task connection object to send the request to the worker, using the `sendSync` method. 
+This method sends the message to the specified exchange with the specified topic (also called "pattern" on the handler, on the worker's side).
+`sendSync` returns a promise to the reply that will be received from the worker.
 
 ```javascript
 function Client(client) { // Constructor
