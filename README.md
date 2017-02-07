@@ -25,7 +25,7 @@ var worker = new Worker(
 
 worker.start();
 ```
-For a more detailed exmaple take a look at our [calculator example](https://github.com/bookmd/rabbit-task/tree/rabbit-task-example/examples/calculator)
+For a more detailed exmaple take a look at our [calculator example](https://github.com/bookmd/rabbit-task/examples/calculator)
 ## Docs
 coming soon (defaultHandler docs too)
 
