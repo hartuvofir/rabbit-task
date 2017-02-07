@@ -1,3 +1,4 @@
+
 # Calculator example
 This example uses rabbit-task to implement a simple calculator worker.
 The worker receives messages containing a string representing a mathematical expression, evaluates it and returns the result to the caller.
