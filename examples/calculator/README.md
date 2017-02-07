@@ -125,7 +125,7 @@ Configuration.prototype.configBindings = function() {
 module.exports = Configuration;
 ```
 ### worker.js
-This file binds it all togher to create our worker and start it.
+This file binds it all togher to create our worker and then starts it.
 ```javascript
 var Worker = require('../../../lib/worker');
 var Connection = require('../../../lib/connection');
