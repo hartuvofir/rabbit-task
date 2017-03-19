@@ -1,0 +1,47 @@
+{
+  "parser"  : "babel-eslint",
+  "plugins": [
+    "import"
+  ],
+  "extends" : ["airbnb"],
+  "rules": {
+    // Soft some rules.
+    "comma-dangle": [2, "always-multiline"], // better for version source control reviews.
+    "no-underscore-dangle": 0, // Allow private method
+    "default-case": 0, // Required default case is nonsense.
+    "new-cap": [2, {"capIsNew": false, "newIsCap": true}], // For Record() etc.
+    "no-nested-ternary": 0, // Proves useful in JSX.
+    "no-param-reassign": 0, // We love param reassignment. useful for optional params.
+    "no-shadow": 0, // Shadowing is a nice language feature, it's still JS.
+    "no-console": 2,
+    "prefer-const": [2, {"destructuring": "all"}],
+    // eslint-plugin-import
+    "import/no-unresolved": [2, {"commonjs": true}],
+    "import/named": 2,
+    "import/default": 2,
+    "import/namespace": 2,
+    "import/export": 2,
+    // Overide Stateless
+    "react/prefer-stateless-function": 0,
+    "react/prefer-es6-class": 0,
+    "react/prop-types": [2, {"ignore": ["dispatch", "children"]}],
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.test.js", "**/*.spec.js", "**/gulpfile.babel.js"]}]
+  },
+  "globals": {
+    "require": false
+  },
+  "settings": {
+    "import/ignore": [
+      "node_modules",
+      "\\.json$"
+    ],
+    "import/parser": "babel-eslint",
+    "import/resolve": {
+      "extensions": [
+        ".js",
+        ".jsx",
+        ".json"
+      ]
+    }
+  }
+}

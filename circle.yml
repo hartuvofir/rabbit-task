@@ -1,7 +1,25 @@
 machine:
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
   node:
-    version: 4.2.2
+    version: 6.9.0
+
+dependencies:
+  override:
+      - yarn
+      - yarn --ignore-engines
+  cache_directories:
+    - ~/.cache/yarn
+
 test:
   override:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit
-    - mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/junit/test-results.xml --recursive
+    - yarn run build-ci
+  post:
+    - cp test-results.xml $CIRCLE_TEST_REPORTS/junit/test-results.xml
+
+deployment:
+  development:
+    branch: [master]
+    commands:
+      - ./deploy.sh

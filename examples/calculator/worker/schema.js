@@ -1,11 +1,10 @@
 /**
  * Created by meirshalev on 02/02/2017.
  */
+const Joi = require('joi');
 
-var Joi = require('joi');
-
-var messageSchema = Joi.object().keys({
-  expression: Joi.string().required()
+const messageSchema = Joi.object().keys({
+  expression: Joi.string().required(),
 });
 
 module.exports = messageSchema;

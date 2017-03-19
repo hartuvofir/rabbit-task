@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "prefer-arrow-callback": 0, // Important for Mocha to work as expected
+    "func-names": 0, // no need to name every test function
+    "no-unused-expressions": 0 // chai has a lot of properties acting as asserts
+  },
+  "globals": {
+    "after": false,
+    "afterEach": false,
+    "before": false,
+    "beforeEach": false,
+    "describe": false,
+    "it": false
+  }
+}

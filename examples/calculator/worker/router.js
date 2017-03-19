@@ -1,11 +1,11 @@
 /**
  * Created by meirshalev on 02/02/2017.
  */
-var HandlerRouter = require('../../../lib/handlers/router');
-var CalculatorHandler = require('./calculatorHandler');
+const HandlerRouter = require('../../../dist').HandlerRouter;
+const CalculatorHandler = require('./calculatorHandler');
 
-var router = new HandlerRouter([
-  CalculatorHandler
+const router = new HandlerRouter([
+  CalculatorHandler,
 ]);
 
 module.exports = router;

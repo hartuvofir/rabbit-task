@@ -1,10 +1,15 @@
 {
   "name": "rabbit-task",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "opinionated RabbitMQ worker",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "mocha test --recursive"
+    "lint": "gulp lint",
+    "babel": "gulp babel",
+    "test": "gulp test",
+    "test-ci": "gulp test-ci",
+    "build": "gulp build",
+    "build-ci": "gulp build-ci"
   },
   "repository": {
     "type": "git",
@@ -23,21 +28,45 @@
   "homepage": "https://github.com/bookmd/rabbit-task#readme",
   "dependencies": {
     "amqplib": "^0.4.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-runtime": "^6.23.0",
+    "bluebird": "^3.4.7",
     "chance": "^1.0.1",
     "core-js": "^1.2.6",
+    "joi": "^7.0.1",
     "lodash": "^3.10.1",
     "minimist": "^1.2.0",
-    "winston": "^2.2.0",
-    "joi": "^7.0.1",
-    "mathjs": "latest"
+    "winston": "^2.2.0"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
+    "babel-core": "^6.16.0",
+    "babel-eslint": "^7.0.0",
+    "babel-plugin-transform-builtin-extend": "^1.1.2",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-stage-1": "^6.22.0",
+    "babel-preset-stage-2": "^6.16.0",
+    "babel-register": "^6.16.3",
+    "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
+    "eslint": "^3.7.0",
+    "eslint-config-airbnb": "^12.0.0",
+    "eslint-plugin-import": "^1.16.0",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-react": "^6.3.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-eslint": "^3.0.1",
+    "gulp-mocha": "^3.0.1",
+    "gulp-nodemon": "^2.0.6",
+    "gulp-if": "^2.0.2",
+    "joi": "^7.0.1",
+    "mathjs": "latest",
     "mocha": "^2.3.4",
     "mocha-junit-reporter": "^1.9.1",
-    "joi": "^7.0.1",
-    "gulp": "^3.9.0",
-    "gulp-nodemon": "^2.0.6"
+    "node-geocoder": "^3.16.0",
+    "run-sequence": "^1.2.2",
+    "sinon": "^1.17.7",
+    "sinon-chai": "^2.8.0"
   }
 }

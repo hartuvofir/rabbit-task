@@ -1,28 +1,33 @@
 /**
  * Created by meirshalev on 05/02/2017.
  */
-var schema = require('./schema');
-var JsonSchemaHandler = require('../../../lib/handlers/jsonSchemaHandler');
-var math = require('mathjs'); // A nice math library that can evaluate string expressions.
-var constants = require('../constants');
+const schema = require('./schema');
+const JoiMiddleware = require('../../../dist').JoiMiddleware;
+// A nice math library that can evaluate string expressions.
+const math = require('mathjs'); // eslint-disable-line import/no-extraneous-dependencies
+const constants = require('../constants');
 
-var calculatorHandler =  {
+function evaluate({ content: { expression } }) {
+  console.log(`received expression: ${expression}`);
+  const result = math.eval(expression);
+  console.log(`result: ${result}`);
+  return Promise.resolve({ result });
+}
+
+const calculatorHandler = {
   name: 'calculatorHandler',
   pattern: constants.expressionEvalTopic,
-  base: JsonSchemaHandler,
+  middleware: {
+    pre: [JoiMiddleware.pre],
+    post: [JoiMiddleware.post],
+  },
   handle: evaluate,
   options: {
-    schema: schema
-  }
+    joi: {
+      schema,
+    },
+  },
 };
 
-function evaluate(msg) {
-  var expression = msg.expression;
-  console.log('received expression: ' + expression);
-
-  var result = math.eval(expression);
-  console.log('result: ' + result);
-  return { result: result };
-}
 
 module.exports = calculatorHandler;

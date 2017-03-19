@@ -5,10 +5,10 @@
 /**
  * @type {{exchangeName: string, queueName: string, expressionEvalTopic: string}}
  */
-var constants = {
+const constants = {
   exchangeName: 'rabbittask.example.calculator.exchange',
   queueName: 'rabbittask.example.calculator.queue',
-  expressionEvalTopic: 'CALCULATOR.EXPRESSION.EVAL'
+  expressionEvalTopic: 'CALCULATOR.EXPRESSION.EVAL',
 };
 
 module.exports = constants;
