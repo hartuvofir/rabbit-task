@@ -116,7 +116,8 @@ export default class MsgHandler {
       ...pre
     );
 
-    return handler(msg)
+    // Force bluebird promise if not already
+    return Promise.resolve().then(() => handler(msg))
       .tap(res => this.reply(sender, msg, res))
       .catch((err) => {
         logger.instance.error(

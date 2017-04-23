@@ -40,12 +40,7 @@ export default class RabbitService {
   static toRabbitHandlers(tasks) {
     const handlers = [];
     _.each(tasks, (task) => {
-      const { name, topic, handler, ...other } = task;
-      const options = _.omit(other, ['sync', 'description']);
-      const middleware = {
-        pre: [],
-        post: [],
-      };
+      const { name, topic, handler, middleware, options } = task;
 
       handlers.push({
         name,
@@ -85,16 +80,17 @@ export default class RabbitService {
     _.each(wantedTasks, (task) => {
       const { name, topic, sync } = task;
 
-      clientInterface[name] = sync ? function interfaceSendSync(msg) {
+      clientInterface[name] = sync ? function interfaceSendSync(msg, meta) {
         return RabbitService.sendSync(
           serviceName,
           name,
           client,
           serverMeta,
           topic,
-          msg
+          msg,
+          meta
         );
-      } : function interfaceSendAsync(msg, context) {
+      } : function interfaceSendAsync(msg, meta, context) {
         return RabbitService.sendAsync(
           serviceName,
           name,
@@ -102,6 +98,7 @@ export default class RabbitService {
           serverMeta,
           topic,
           msg,
+          meta,
           context,
         );
       };
@@ -133,8 +130,8 @@ export default class RabbitService {
    * @param context
    * @returns {Promise.<T>}
    */
-  static sendAsync(serviceName, taskName, client, serverMeta, topicName, data, context) {
-    return client.sendAsync(serverMeta, topicName, data, context)
+  static sendAsync(serviceName, taskName, client, serverMeta, topicName, data, meta, context) {
+    return client.sendAsync(serverMeta, topicName, data, meta, context)
       .catch(() => {
         const error = `could not send message to ${topicName}`;
         Log.error(`[${serviceName}/${taskName}] - ${error}`);
@@ -152,8 +149,8 @@ export default class RabbitService {
    * @param data
    * @returns {Promise.<T>}
    */
-  static sendSync(serviceName, taskName, client, serverMeta, topicName, data) {
-    return client.sendSync(serverMeta, topicName, data)
+  static sendSync(serviceName, taskName, client, serverMeta, topicName, data, meta) {
+    return client.sendSync(serverMeta, topicName, data, meta)
       .then(result => result && JSON.parse(result.content.toString()))
       .catch((error) => {
         error = error.content ? error.content.toString() : error.toString();

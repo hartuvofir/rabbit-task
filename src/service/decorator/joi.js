@@ -6,5 +6,5 @@ import * as JoiHooks from '../../lib/middleware/joiMiddleware';
 
 export default function JoiMiddleware(schema) {
   if (!schema) throw new TypeError('schema is required');
-  return Middleware('Joi', JoiHooks.pre, NOOP, { schema });
+  return Middleware('joi', JoiHooks.pre, NOOP, { schema });
 }

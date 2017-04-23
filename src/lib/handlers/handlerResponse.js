@@ -27,6 +27,7 @@ export default class HandlerResponse {
     if (originalMessage) {
       this.properties.correlationId = originalMessage.properties.messageId;
       this.headers.topic = originalMessage.headers.topic;
+      this.meta = originalMessage.headers.meta;
       this.replyTo = originalMessage.properties.replyTo;
     }
 

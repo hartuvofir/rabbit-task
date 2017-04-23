@@ -52,4 +52,28 @@ describe('ComposePromise', function () {
     const middleware = composePromise(...(post.reverse()), handle, ...pre);
     expect(middleware(0)).to.eventually.be.equal(0).notify(done);
   });
+
+  it('rejects promise if one have failed', function (done) {
+    const middleware = composePromise(
+      msg => Promise.resolve(msg + msg),
+      msg => Promise.reject(msg * 10),
+      msg => Promise.resolve(Number.parseInt(msg, 10)),
+    );
+    expect(middleware('7')).to.eventually.rejected.notify(done);
+  });
+
+  it('it wraps a handler with pre and post middleware correctly and rejects', function (done) {
+    const pre = [
+      () => Promise.reject(),
+      msg => Promise.resolve(1 + msg),
+    ];
+    const post = [
+      msg => Promise.resolve(3 / msg),
+      msg => Promise.resolve(msg - 1),
+    ];
+    const handle = msg => Promise.resolve(msg);
+
+    const middleware = composePromise(...(post.reverse()), handle, ...pre);
+    expect(middleware(0)).to.eventually.be.equal(0).notify(done);
+  });
 });

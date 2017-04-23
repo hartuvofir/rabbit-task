@@ -45,7 +45,7 @@ export default class Client {
     // Optional - specify consumer tag
     this.consumerTag = consumerTag ? `${consumerTag}-client` : undefined;
     // Pre Hooks
-    this.preHook = function clientPreHook(server, topic, msg, context, replyOpt) {}; //eslint-disable-line
+    this.preHook = function clientPreHook(server, topic, msg, meta, context, replyOpt) {}; // eslint-disable-line
   }
 
   /**
@@ -134,8 +134,8 @@ export default class Client {
    * @returns {Promise}
    * @private
    */
-  _send(server, topic, msg, context, replyOpt) {
-    this.preHook(server, topic, msg, context, replyOpt);
+  _send(server, topic, msg, meta = {}, context = {}, replyOpt = {}) {
+    this.preHook(server, topic, msg, meta, context, replyOpt);
 
     // Generate Task ID
     const id = chance.guid();
@@ -167,7 +167,7 @@ export default class Client {
         server.serverQueueName || topic,
         msg, {
           replyTo,
-          headers: { topic, replyToTopic, context },
+          headers: { topic, replyToTopic, context, meta },
           messageId: id,
         });
       if (publish) resolve();
@@ -185,8 +185,8 @@ export default class Client {
    * @param msg
    * @returns {Promise}
    */
-  sendSync(server, topic, msg) {
-    const send = this._send(server, topic, msg, {}, {});
+  sendSync(server, topic, msg, meta) {
+    const send = this._send(server, topic, msg, meta, {}, {});
     return send.responsePromise;
   }
 
@@ -199,11 +199,12 @@ export default class Client {
    * @param replyOpt
    * @returns {Promise}
    */
-  sendAsync(server, topic, msg, context, replyOpt) {
+  sendAsync(server, topic, msg, meta, context, replyOpt) {
     const send = this._send(
       server,
       topic,
       msg,
+      meta,
       context,
       _.extend({}, replyOpt, { queue: this.asyncResponseQueue })
     );

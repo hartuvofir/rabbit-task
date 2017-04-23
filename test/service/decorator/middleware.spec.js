@@ -5,31 +5,31 @@ import { expect } from 'chai';
 import Promise from 'bluebird';
 
 import BaseService from '../../../src/service/baseService';
-import { Middelware } from '../../../src/service/decorator';
+import { Middleware } from '../../../src/service/decorator';
 
 const passThrough = msg => Promise.resolve(msg);
 describe('middlewareDecorator', function () {
   describe('validation', function () {
     it('verifies that name is provided', function () {
-      expect(() => Middelware()).to.throw(TypeError);
+      expect(() => Middleware()).to.throw(TypeError);
     });
 
     it('verifies that pre hook is provided', function () {
-      expect(() => Middelware('name', {})).to.throw(TypeError);
-      expect(() => Middelware('name', 'a')).to.throw(TypeError);
-      expect(() => Middelware('name', [])).to.throw(TypeError);
+      expect(() => Middleware('name', {})).to.throw(TypeError);
+      expect(() => Middleware('name', 'a')).to.throw(TypeError);
+      expect(() => Middleware('name', [])).to.throw(TypeError);
     });
 
     it('verifies that post hook is provided', function () {
-      expect(() => Middelware('name', passThrough, {})).to.throw(TypeError);
-      expect(() => Middelware('name', passThrough, 'a')).to.throw(TypeError);
-      expect(() => Middelware('name', passThrough, [])).to.throw(TypeError);
+      expect(() => Middleware('name', passThrough, {})).to.throw(TypeError);
+      expect(() => Middleware('name', passThrough, 'a')).to.throw(TypeError);
+      expect(() => Middleware('name', passThrough, [])).to.throw(TypeError);
     });
 
     it('accepts valid input', function () {
-      expect(() => Middelware('name')).to.be.a.function;
-      expect(() => Middelware('name', passThrough)).to.be.a.function;
-      expect(() => Middelware('name', passThrough, passThrough)).to.be.a.function;
+      expect(() => Middleware('name')).to.be.a.function;
+      expect(() => Middleware('name', passThrough)).to.be.a.function;
+      expect(() => Middleware('name', passThrough, passThrough)).to.be.a.function;
     });
   });
 
@@ -37,7 +37,7 @@ describe('middlewareDecorator', function () {
     beforeEach(function () {
       this.pre = () => Promise.resolve('PRE');
       this.post = () => Promise.resolve('POST');
-      this.decorator = Middelware('name', this.pre, this.post, { opt: 'a' });
+      this.decorator = Middleware('name', this.pre, this.post, { opt: 'a' });
       this.service = new BaseService('stam');
     });
 
