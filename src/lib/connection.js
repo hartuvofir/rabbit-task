@@ -62,7 +62,7 @@ export default class Connection extends EventEmitter {
       logger.instance.error('[AMQP] conn error', err.message);
       if (err.message.match(/ECONNREFUSED/)) {
         logger.instance.error('[AMQP] reconnecting');
-        setTimeout(this.connect(), RETRY_CONNECT_TIMEOUT);
+        setTimeout(() => this.connect(), RETRY_CONNECT_TIMEOUT);
       }
       this.emit('error', err);
     });
