@@ -5,11 +5,13 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
 import _ from 'lodash';
+import * as Errio from 'errio';
 
 import Router from '../../src/lib/handlers/router';
 import Client from '../../src/lib/client';
 import RabbitService from '../../src/service/rabbitService';
 import TwilioService from './twilioService';
+import ExtendableError from '../../src/lib/error/extendableError';
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -122,20 +124,37 @@ describe('RabbitService', function () {
          */
         const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
         expect(client.sendSms('911', 'Help')).to.eventually
-          .deep.equal({ status: 'ok' }).and.notify(done);
+        .deep.equal({ status: 'ok' }).and.notify(done);
       });
 
-      it('handles rabbit errors correctly', function (done) {
-        this.rabbitClient.sendSync = () =>
-          Promise.reject({ content: new Buffer('{"status": "bad"}') });
+      describe('handles rabbit errors correctly', function () {
+        it('handles custom errors correctly', function (done) {
+          class MyError extends ExtendableError {}
 
-        /**
-         * Defines a TwilioService client interface
-         * @type {TwilioService}
-         */
-        const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
-        expect(client.sendSms('911', 'Help'))
-          .to.eventually.be.rejectedWith(Error, '{"status": "bad"}').and.notify(done);
+          this.rabbitClient.sendSync = () =>
+            Promise.reject({ content: new Buffer(Errio.stringify(new MyError('my new error'))) });
+
+          /**
+           * Defines a TwilioService client interface
+           * @type {TwilioService}
+           */
+          const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
+          expect(client.sendSms('911', 'Help'))
+          .to.eventually.be.rejectedWith(MyError, 'my new error').and.notify(done);
+        });
+
+        it('handles Error correctly', function (done) {
+          this.rabbitClient.sendSync = () =>
+            Promise.reject({ content: new Buffer(Errio.stringify(new Error('my new error'))) });
+
+          /**
+           * Defines a TwilioService client interface
+           * @type {TwilioService}
+           */
+          const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
+          expect(client.sendSms('911', 'Help'))
+          .to.eventually.be.rejectedWith(Error, 'my new error').and.notify(done);
+        });
       });
     });
   });

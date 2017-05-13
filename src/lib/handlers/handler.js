@@ -3,6 +3,7 @@
  */
 import _ from 'lodash';
 import Promise from 'bluebird';
+import * as Errio from 'errio';
 
 import logger from '../logger';
 import TemporaryError from '../error/temporaryError';
@@ -127,6 +128,7 @@ export default class MsgHandler {
         // otherwise reinsert it back to the message queue or if the TemporaryError has
         // no retries left
         if (!(err instanceof TemporaryError) || msg.headers['x-attempts-left'] <= 1) {
+          err = Errio.stringify(err);
           this.reply(sender, msg, err, { isError: true });
         } else if (sender.nackExchange) {
           logger.instance.error('[MsgHandler] app-nacks a msg with tag: ', msg.fields.consumerTag);

@@ -36,7 +36,8 @@
     "joi": "^7.0.1",
     "lodash": "^3.10.1",
     "minimist": "^1.2.0",
-    "winston": "^2.2.0"
+    "winston": "^2.2.0",
+    "errio": "^1.2.2"
   },
   "devDependencies": {
     "babel-core": "^6.16.0",

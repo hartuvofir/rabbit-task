@@ -11,9 +11,10 @@ import BaseService from '../baseService';
  * @param sync
  * @param description
  * @param topic
+ * @param errors
  * @returns {taskDecorator}
  */
-export default function Task({ sync, description, topic }) {
+export default function Task({ sync, description, topic, errors = [] }) {
   if (!topic || !_.isString(topic)) throw new TypeError('topic is required and must be a string');
   if (sync && !_.isBoolean(sync)) throw new TypeError('sync must be a boolean');
   if (description && !_.isString(description)) throw new TypeError('description must be a string');
@@ -37,6 +38,7 @@ export default function Task({ sync, description, topic }) {
       sync,
       topic,
       description,
+      errors,
     };
   };
 }

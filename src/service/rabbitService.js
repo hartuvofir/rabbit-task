@@ -3,6 +3,7 @@
  */
 import _ from 'lodash';
 import Promise from 'bluebird';
+import * as Errio from 'errio';
 
 import Logger from '../lib/logger';
 import Router from '../lib/handlers/router';
@@ -78,7 +79,12 @@ export default class RabbitService {
     const wantedTasks = RabbitService._getTasks(service, tasks);
     const clientInterface = {};
     _.each(wantedTasks, (task) => {
-      const { name, topic, sync } = task;
+      const { name, topic, sync, errors } = task;
+
+      // register errors with Errio
+      _.each(errors, (error) => {
+        Errio.register(error, { name: `${name}.${error.prototype.name}` });
+      });
 
       clientInterface[name] = sync ? function interfaceSendSync(msg, meta) {
         return RabbitService.sendSync(
@@ -153,9 +159,10 @@ export default class RabbitService {
     return client.sendSync(serverMeta, topicName, data, meta)
       .then(result => result && JSON.parse(result.content.toString()))
       .catch((error) => {
-        error = error.content ? error.content.toString() : error.toString();
+        const errorString = error.content ? error.content.toString() : error.toString();
+        error = Errio.parse(errorString);
         Log.error(`[${serviceName}/${taskName}] - error for topic ${topicName}: ${error}`);
-        return Promise.reject(new Error(error));
+        return Promise.reject(error);
       });
   }
 }
