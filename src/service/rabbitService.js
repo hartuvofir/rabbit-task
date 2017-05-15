@@ -83,7 +83,7 @@ export default class RabbitService {
 
       // register errors with Errio
       _.each(errors, (error) => {
-        Errio.register(error, { name: `${name}.${error.prototype.name}` });
+        Errio.register(error);
       });
 
       clientInterface[name] = sync ? function interfaceSendSync(msg, meta) {

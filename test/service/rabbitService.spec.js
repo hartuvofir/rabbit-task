@@ -134,10 +134,6 @@ describe('RabbitService', function () {
           this.rabbitClient.sendSync = () =>
             Promise.reject({ content: new Buffer(Errio.stringify(new MyError('my new error'))) });
 
-          /**
-           * Defines a TwilioService client interface
-           * @type {TwilioService}
-           */
           const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
           expect(client.sendSms('911', 'Help'))
           .to.eventually.be.rejectedWith(MyError, 'my new error').and.notify(done);
@@ -147,13 +143,18 @@ describe('RabbitService', function () {
           this.rabbitClient.sendSync = () =>
             Promise.reject({ content: new Buffer(Errio.stringify(new Error('my new error'))) });
 
-          /**
-           * Defines a TwilioService client interface
-           * @type {TwilioService}
-           */
           const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
           expect(client.sendSms('911', 'Help'))
           .to.eventually.be.rejectedWith(Error, 'my new error').and.notify(done);
+        });
+
+        it('handles unknown errors correctly', function (done) {
+          this.rabbitClient.sendSync = () =>
+            Promise.reject({ content: '{"name":"UnknownError","isOperational":true}' });
+
+          const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
+          expect(client.sendSms('911', 'Help'))
+          .to.eventually.be.rejectedWith(Error).and.notify(done);
         });
       });
     });
