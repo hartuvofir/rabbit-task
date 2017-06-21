@@ -75,7 +75,7 @@ export default class Sender {
    * @param reason
    */
   error(msg, reason) {
-    logger.instance.info(`[Sender] reports an error of a msg:${msg.fields.consumerTag}`);
+    logger.instance.info(`[Sender] reports an error of a msg: ${msg.fields.consumerTag}`);
     this.publish(this.errorExchange, msg.fields.routingKey, msg.content, {
       headers: {
         error: reason,

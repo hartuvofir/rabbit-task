@@ -69,7 +69,9 @@ export default class MsgHandler {
    */
   reply(sender, msg, res, headers) {
     if (!!res && this.shouldReply(msg, res)) {
-      logger.instance.info(`[MsgHandler] replies to a msg with tag: ${msg.fields.consumerTag}`);
+      logger.instance.info(`[MsgHandler] replies to a msg with tag: ${msg.fields.consumerTag}`,
+        { rabbitMsg: msg }
+      );
       try {
         if (!(res instanceof HandlerResponse)) {
           // if acceptable type use res as body, otherwise stringify
@@ -83,15 +85,18 @@ export default class MsgHandler {
         sender.reply(res);
       } catch (e) {
         logger.instance.error(
-          '[MsgHandler] an unexpected error has while attempting to reply to the msg with tag:' +
-          `${msg.fields.consumerTag}
+          `[MsgHandler] an unexpected error has occurred while attempting to reply 
+           to the msg with tag: ${msg.fields.consumerTag}
            Error was ${e.stack || e.toString()}
-           response was: ${res.messageBody || res}`
+           response was: ${res.messageBody || res}`,
+          { error: e, rabbitMsg: msg }
         );
         return Promise.reject(e);
       }
     }
-    logger.instance.info('[MsgHandler] acks a msg with tag: ', msg.fields.consumerTag);
+    logger.instance.info(`[MsgHandler] acks a msg with tag: ${msg.fields.consumerTag}`,
+      { rabbitMsg: msg }
+    );
     const ack = sender.ack(msg.raw);
     return Promise.resolve(ack);
   }
@@ -122,7 +127,8 @@ export default class MsgHandler {
       .tap(res => this.reply(sender, msg, res))
       .catch((err) => {
         logger.instance.error(
-          `[MsgHandler] received the following error from handler: ${err.stack}` || err
+          '[MsgHandler] received the following error from handler',
+          { error: err }
         );
         // If error is NOT of the temporary type, reply as error,
         // otherwise reinsert it back to the message queue or if the TemporaryError has
@@ -131,10 +137,14 @@ export default class MsgHandler {
           err = Errio.stringify(err);
           this.reply(sender, msg, err, { isError: true });
         } else if (sender.nackExchange) {
-          logger.instance.error('[MsgHandler] app-nacks a msg with tag: ', msg.fields.consumerTag);
+          logger.instance.error(`[MsgHandler] app-nacks a msg with tag ${msg.fields.consumerTag}`,
+            { error: err }
+          );
           sender.appNack(msg);
         } else {
-          logger.instance.error('[MsgHandler] nacks a msg with tag: ', msg.fields.consumerTag);
+          logger.instance.error(`[MsgHandler] nacks a msg with tag: ${msg.fields.consumerTag}`,
+            { error: err }
+          );
           sender.nack(msg);
         }
         return Promise.reject(err);

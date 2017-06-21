@@ -131,7 +131,10 @@ export default class HandlerRouter {
         return handlePromise;
       })
       .catch((e) => {
-        logger.instance.info(`[HandlerRouter] an error has occurred during routing ${e.toString()}`);
+        logger.instance.info(
+          '[HandlerRouter] an error has occurred during routing',
+          { error: e }
+        );
       });
   }
 }

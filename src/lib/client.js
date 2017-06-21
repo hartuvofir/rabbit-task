@@ -104,7 +104,7 @@ export default class Client {
       if (msgId) {
         const isError = !!msg.properties.headers.isError;
         if (isError) {
-          this.tasks[msgId].reject(msg);
+          this.tasks[msgId].reject(new Error(msg));
         } else {
           this.tasks[msgId].resolve(msg);
         }
@@ -171,7 +171,7 @@ export default class Client {
           messageId: id,
         });
       if (publish) resolve();
-      else reject();
+      else reject(new Error('publish error'));
     });
 
     // Return both of the promises

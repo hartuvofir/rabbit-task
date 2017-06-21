@@ -46,7 +46,7 @@ export default class Connection extends EventEmitter {
           logger.instance.error('[AMQP] reconnecting');
           setTimeout(() => this.connect(), RECONNECTION_TIMEOUT);
         } else if (err.message !== 'Connection closing') {
-          logger.instance.error('[AMQP] conn error', err.message);
+          logger.instance.error('[AMQP] conn error', { error: err });
           this.emit('error', err);
         }
       });
@@ -59,7 +59,7 @@ export default class Connection extends EventEmitter {
         }
       });
     }, (err) => {
-      logger.instance.error('[AMQP] conn error', err.message);
+      logger.instance.error('[AMQP] conn error', { error: err });
       if (err.message.match(/ECONNREFUSED/)) {
         logger.instance.error('[AMQP] reconnecting');
         setTimeout(() => this.connect(), RETRY_CONNECT_TIMEOUT);
