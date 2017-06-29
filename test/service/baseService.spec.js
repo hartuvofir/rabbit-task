@@ -11,6 +11,6 @@ const expect = chai.expect;
 describe('BaseService', function () {
   it('returns handlers', function () {
     expect(TwilioService.prototype._tasks).to.be.an.object;
-    expect(TwilioService.prototype._tasks).to.have.all.keys('sendSms', 'receiveSms');
+    expect(TwilioService.prototype._tasks).to.have.all.keys('sendSms', 'sendSmsWithBaseError', 'receiveSms');
   });
 });

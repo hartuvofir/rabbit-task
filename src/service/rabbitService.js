@@ -79,12 +79,12 @@ export default class RabbitService {
     const wantedTasks = RabbitService._getTasks(service, tasks);
     const clientInterface = {};
     _.each(wantedTasks, (task) => {
-      const { name, topic, sync, errors } = task;
-
+      const { name, topic, sync, errors, baseError } = task;
       // register errors with Errio
       _.each(errors, (error) => {
         Errio.register(error);
       });
+      if (baseError) Errio.register(baseError);
 
       clientInterface[name] = sync ? function interfaceSendSync(msg, meta) {
         return RabbitService.sendSync(
@@ -93,6 +93,7 @@ export default class RabbitService {
           client,
           serverMeta,
           topic,
+          baseError,
           msg,
           meta
         );
@@ -155,12 +156,24 @@ export default class RabbitService {
    * @param data
    * @returns {Promise.<T>}
    */
-  static sendSync(serviceName, taskName, client, serverMeta, topicName, data, meta) {
+  static sendSync(serviceName, taskName, client, serverMeta, topicName, baseError, data, meta) {
     return client.sendSync(serverMeta, topicName, data, meta)
       .then(result => result && JSON.parse(result.content.toString()))
       .catch((error) => {
         const errorString = error.content ? error.content.toString() : error.toString();
         error = Errio.parse(errorString);
+
+        // if base error is set and the error isn't an instance of base error
+        if (baseError && !(error instanceof baseError)) {
+          error = new baseError(error.toString()); // eslint-disable-line new-cap
+        }
+
+        // Store metadata on the error to identify the service/task
+        error.meta = {
+          service: serviceName,
+          task: taskName,
+        };
+
         Log.error(`[${serviceName}/${taskName}] - error for topic ${topicName}: ${error}`);
         return Promise.reject(error);
       });

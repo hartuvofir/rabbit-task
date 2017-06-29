@@ -10,7 +10,7 @@ import * as Errio from 'errio';
 import Router from '../../src/lib/handlers/router';
 import Client from '../../src/lib/client';
 import RabbitService from '../../src/service/rabbitService';
-import TwilioService from './twilioService';
+import { default as TwilioService, BaseError } from './twilioService';
 import ExtendableError from '../../src/lib/error/extendableError';
 
 chai.use(sinonChai);
@@ -23,7 +23,7 @@ describe('RabbitService', function () {
     it('returns a valid routes object', function () {
       const handlers = RabbitService.toRabbitHandlers(TwilioService.prototype._tasks);
       expect(handlers).to.be.an.array;
-      expect(handlers).to.have.length.of(2);
+      expect(handlers).to.have.length.of(3);
       const send = _.find(handlers, { name: 'sendSms' });
       expect(send).to.have.all.keys('name', 'pattern', 'handle', 'options', 'middleware');
     });
@@ -56,7 +56,7 @@ describe('RabbitService', function () {
       const router = new Router();
       RabbitService.register(router, TwilioService);
       expect(router.handlers).to.be.an.array;
-      expect(router.handlers).to.have.length.of(2);
+      expect(router.handlers).to.have.length.of(3);
     });
 
     it('registers all only a subset of the handlers', function () {
@@ -77,7 +77,7 @@ describe('RabbitService', function () {
       const router = new Router();
       RabbitService.register(router, new TwilioService());
       expect(router.handlers).to.be.an.array;
-      expect(router.handlers).to.have.length.of(2);
+      expect(router.handlers).to.have.length.of(3);
     });
   });
 
@@ -105,7 +105,7 @@ describe('RabbitService', function () {
       it('returns an interface object for a wanted service', function () {
         const client = RabbitService.getClient(TwilioService, new Client(), serverMeta);
         expect(client).to.be.an.object;
-        expect(client).to.have.all.keys('sendSms', 'receiveSms');
+        expect(client).to.have.all.keys('sendSms', 'sendSmsWithBaseError', 'receiveSms');
       });
     });
 
@@ -135,8 +135,10 @@ describe('RabbitService', function () {
             Promise.reject({ content: new Buffer(Errio.stringify(new MyError('my new error'))) });
 
           const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
+          const rejection = new MyError();
+          rejection.meta = { service: 'TwilioService', task: 'sendSms' };
           expect(client.sendSms('911', 'Help'))
-          .to.eventually.be.rejectedWith(MyError, 'my new error').and.notify(done);
+          .to.eventually.be.rejectedWith(MyError).and.notify(done);
         });
 
         it('handles Error correctly', function (done) {
@@ -155,6 +157,46 @@ describe('RabbitService', function () {
           const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
           expect(client.sendSms('911', 'Help'))
           .to.eventually.be.rejectedWith(Error).and.notify(done);
+        });
+
+        it('stores the service name and task name in the error\'s metadata', function (done) {
+          this.rabbitClient.sendSync = () =>
+            Promise.reject({ content: new Buffer(Errio.stringify(new Error('my new error'))) });
+
+          const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
+          expect(client.sendSms('911', 'Help'))
+          .to.eventually.be.rejected
+          .and.to.deep.equal({
+            meta: {
+              service: 'TwilioService',
+              task: 'sendSms',
+            },
+            message: 'my new error',
+            name: 'Error',
+          })
+          .and.notify(done);
+        });
+
+        describe('base error option', function () {
+          it('wraps errors that are not instance of base error with the base error', function (done) {
+            this.rabbitClient.sendSync = () =>
+              Promise.reject({ content: new Buffer(Errio.stringify(new Error('my new error'))) });
+
+            const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
+            expect(client.sendSmsWithBaseError('911', 'Help'))
+            .to.eventually.be.rejectedWith(BaseError, 'my new error').and.notify(done);
+          });
+
+          it('does not change errors that are instance of base error', function (done) {
+            class MyNewError extends BaseError {}
+
+            this.rabbitClient.sendSync = () =>
+              Promise.reject({ content: new Buffer(Errio.stringify(new MyNewError('my new error'))) });
+
+            const client = RabbitService.getClient(TwilioService, this.rabbitClient, serverMeta);
+            expect(client.sendSmsWithBaseError('911', 'Help'))
+            .to.eventually.be.rejectedWith(MyNewError, 'my new error').and.notify(done);
+          });
         });
       });
     });
