@@ -21,7 +21,7 @@ export default class Listener extends EventEmitter {
    * Start consuming messages
    */
   start() {
-      logger.instance.log('[AMQP] Listener starts');
+      logger.instance.info('[AMQP] Listener starts in ');
       let options = { noAck: false };
       const hasConsumerTag = !!this.consumerTag;
       options = hasConsumerTag ?
@@ -29,15 +29,16 @@ export default class Listener extends EventEmitter {
           options;
 
       if(!this.pullingEmitter) {
-          logger.instance.log('[AMQP] Listener starts in *Push* mode');
+          logger.instance.info('[AMQP] Listener starts in *Push* mode');
           this.channel.consume(this.queue,msg => this.processMsg(msg),options,)
               .then((fields) => {
                   this.consumerTag = fields.consumerTag;
               });
       }
       else{
-          logger.instance.log('[AMQP] Listener starts in *Pull* mode');
+          logger.instance.info('[AMQP] Listener starts in *Pull* mode');
           this.pullingEmitter.on('pull',()=>{
+
               this.channel.get(this.queue,{ noAck: false }).then((msg) => {
                   if(msg !== false){ // false means that there's no messages to pull in the queue
                       this.processMsg(msg);

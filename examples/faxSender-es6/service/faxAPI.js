@@ -18,35 +18,38 @@ export default class FaxAPI{
         console.log(`Init sendInterval: ${FaxAPI.sendInterval} AND lastTimeSent: ${FaxAPI.lastTimeSent}`);
     }
 
-    static sendFax(faxContent,timeSent,callback){
-            console.log(`Try to print fax : ${faxContent} timeSent : ${timeSent}`);
+    static sendFax(faxContent,timeSent){
+      return new Promise(function(resolve,reject) {
+        console.log(`Try to print fax : ${faxContent} timeSent : ${timeSent}`);
 
-            try{
-                console.log(`FaxAPI.sendInterval: ${FaxAPI.sendInterval}, FaxAPI.lastTimeSent: ${FaxAPI.lastTimeSent}, FaxAPI.dbClient: ${FaxAPI.dbClient}`);
-                if (math.sum(timeSent, -FaxAPI.lastTimeSent) < FaxAPI.sendInterval){
-                    console.log(`Cannot print fax in a interval lower then ${FaxAPI.sendInterval}, por favor!`);
-                    callback (new Errors.FaxError(`Cannot print fax in a interval lower then ${FaxAPI.sendInterval}, por favor!`));
-                }
-                if(!FaxAPI.dbClient){
-                    console.log(`Cannot connect to fax machine (db-connection-problem)!`);
-                    callback (new Errors.FaxError(`Cannot connect to fax machine (db-connection-problem)!`));
-                }
+        try{
+          console.log(`FaxAPI.sendInterval: ${FaxAPI.sendInterval}, FaxAPI.lastTimeSent: ${FaxAPI.lastTimeSent}, FaxAPI.dbClient: ${FaxAPI.dbClient}`);
+          if (math.sum(timeSent, -FaxAPI.lastTimeSent) < FaxAPI.sendInterval){
+            console.log(`Cannot print fax in a interval lower then ${FaxAPI.sendInterval}, por favor!`);
+            reject(new Errors.FaxError(`Cannot print fax in a interval lower then ${FaxAPI.sendInterval}, por favor!`));
+          }
+          if(!FaxAPI.dbClient){
+            console.log(`Cannot connect to fax machine (db-connection-problem)!`);
+            reject(new Errors.FaxError(`Cannot connect to fax machine (db-connection-problem)!`));
+          }
 
-                FaxAPI.dbClient.query(insertQuery,[faxContent,new Date(timeSent)], (insertErr, insertRes) => {
-                    if (insertErr){
-                        console.log(`Error while trying to print fax (Error: ${insertErr.stack})`);
-                        callback (new Errors.FaxError(`Error while trying to print fax (Error: ${insertErr.stack})`));
-                    }
-                    else if (insertRes.rowCount === 1){
-                        console.log(`Print successfully the fax ${faxContent}`);
-                        callback(`Print successfully the fax ${faxContent}`);
-                    }
-                });
-
+          FaxAPI.dbClient.query(insertQuery,[faxContent,new Date(timeSent)], (insertErr, insertRes) => {
+            if (insertErr){
+              console.log(`Error while trying to print fax (Error: ${insertErr.stack})`);
+              reject(new Errors.FaxError(`Error while trying to print fax (Error: ${insertErr.stack})`));
             }
-            catch(err){
-                callback (new Errors.FaxError(`Error while trying to print fax (Error: ${err.stack})`));
+            else if (insertRes.rowCount === 1){
+              console.log(`Print successfully the fax ${faxContent}`);
+              resolve(`Print successfully the fax ${faxContent}`);
             }
+          });
+
+        }
+        catch(err){
+          reject(new Errors.FaxError(`Error while trying to print fax (Error: ${err.stack})`));
+        }
+      });
+
     }
 
     static _connect(dbCredentials){

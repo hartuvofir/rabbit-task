@@ -15,50 +15,54 @@ export default class PullSyncer{
         this.pullEmitter = pullEmitter;
 
         this.pullEmitter.once('start',()=>{
-            this._start(dbCredentials)
+            this._start(dbCredentials);
         });
     }
 
     _start(dbCredentials){
-        try{
-            // connect to the db
-            this.client = this._connect(dbCredentials);
-            if(this.client){
-               this.pullEmitter.on('finish',()=> this._tryPull()); // raised after every failed pulling or full invocation cycle;
-               this._tryPull(); // for the first time
-            }
+        let this2 = this;
+        // connect to the db
+            this._connect(dbCredentials).then((client) => {
+                this2.client = client;
+                this2.pullEmitter.on('finish',()=> this2._tryPull()); // raised after every failed pulling or full invocation cycle;
+                this2._tryPull(); // for the first time
+            }).catch((e)=>{
+                Log.error(`PullSyncer: Error while trying to connect sync DB, sync pulling is down - Error: ${e}`);
+            });
         }
-        catch(e){
-            Log.error(`PullSyncer: Error while trying to connect sync DB, sync pulling is down - Error: ${e}`);
-        }
-    }
 
-    _connect(dbCredentials){
-        let client = new pg.Client({
-            user: dbCredentials.user,
-            password: dbCredentials.password,
-            database: dbCredentials.database,
-            host: dbCredentials.host,
-            port: dbCredentials.port
-        });
+    _connect(dbCredentials)
+    {
+        return new Promise(function(resolve,reject){
+            let client = new pg.Client({
+                user: dbCredentials.user,
+                password: dbCredentials.password,
+                database: dbCredentials.database,
+                host: dbCredentials.host,
+                port: dbCredentials.port
+            });
 
-        Log.info(`PullSyncer: Try connect to DB with the credentials: user: ${client.user}, 
+            Log.info(`PullSyncer: Try connect to DB with the credentials: user: ${client.user}, 
                   database: ${client.database}, port: ${client.port} , host: ${client.host}`);
 
-        client.connect((err) => {
+            client.connect((err) => {
                 if (err){
                     Log.error(`PullSyncer: Error while trying to connect sync DB, sync pulling is down - Error: ${err}`);
-                    return null;
+                    reject(err);
+                }
+                else{
+                    Log.info(`PullSyncer: Connected to sync DB successfully.`);
+                    resolve(client);
                 }
             });
-        Log.info(`PullSyncer: Connected to sync DB successfully.`);
-        return client;
+        });
     }
 
     _tryPull(){
-        if(this.client) {
             this._isExecuteAllowed().then((isAllowed) =>  {
-                if(isAllowed) this.pullEmitter.emit('pull');
+                if(isAllowed) {
+                    this.pullEmitter.emit('pull');
+                }
                 else {
                     setTimeout(()=>this.pullEmitter.emit('finish'),this.minInterval); // start the next pull cycle only after the minimum Interval
                 }
@@ -66,11 +70,10 @@ export default class PullSyncer{
             .catch((err)=>
                 Log.error(`Error while trying to ask for a pull from the DB: ${err}`));
         }
-    }
 
     _isExecuteAllowed(){
         let this2 = this;
-        let promise = new Promise(function(resolve,reject){
+        return new Promise(function(resolve,reject){
             let currentTimeStemp = Date.now();
             this2.client.query(updateQuery,[currentTimeStemp, math.sum(currentTimeStemp,-this2.minInterval)], (updateErr, updateRes) => {
                 try{
@@ -86,6 +89,5 @@ export default class PullSyncer{
                 }
             });
         });
-        return promise;
     }
 }
